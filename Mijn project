@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Discussie & Analyse</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>Discussie & Analyse</h1>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#onderwerpen">Onderwerpen</a>
+        <a href="#over">Over</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" id="home">
+    <section class="intro">
+      <h2>Welkom</h2>
+      <p>Een verzameling logische, wetenschappelijke en religieuze analyses. Kies een onderwerp of zoek direct.</p>
+      <div class="search">
+        <input id="search" placeholder="Zoek op titel, tag of woord..." />
+        <select id="tagFilter">
+          <option value="">Alle onderwerpen</option>
+        </select>
+      </div>
+    </section>
+
+    <section id="onderwerpen">
+      <h2>Artikelen</h2>
+      <div id="articles" class="articles-grid"></div>
+    </section>
+
+    <section id="article-view" class="article-view" hidden>
+      <button id="back">← Terug</button>
+      <article id="full-article"></article>
+    </section>
+
+    <section id="over">
+      <h2>Over</h2>
+      <p>Hier komen informatie over doel, bronnen en hoe artikelen ontstaan (onderzoek, logica, verwijzingen).</p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Wil je dat ik artikelen toevoeg of content schrijf? Stuur een bericht (of vraag hier).</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>© Discussie & Analyse — Gemaakt voor jou</small>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>:root{--bg:#f7f7f9;--accent:#2b6cb0;--card:#fff}
+*{box-sizing:border-box}
+body{font-family:system-ui,Arial,sans-serif;background:var(--bg);color:#111;margin:0}
+.container{max-width:1000px;margin:0 auto;padding:20px}
+.site-header{background:#fff;border-bottom:1px solid #e4e4e7}
+.site-header .container{display:flex;align-items:center;justify-content:space-between}
+.site-header h1{font-size:20px;margin:12px 0}
+nav a{margin-left:12px;text-decoration:none;color:var(--accent)}
+.intro{padding:18px 0}
+.search{display:flex;gap:8px;margin-top:8px}
+.search input, .search select{padding:8px;border:1px solid #d0d0d5;border-radius:6px;flex:1}
+.articles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
+.card{background:var(--card);padding:12px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.card h3{margin:0 0 8px 0;font-size:16px}
+.card p{font-size:14px;color:#444}
+.tag{display:inline-block;background:#eef2ff;color:#1a202c;padding:4px 8px;border-radius:999px;font-size:12px;margin-right:6px}
+.article-view{margin-top:20px;background:var(--card);padding:18px;border-radius:8px}
+#back{background:none;border:0;color:var(--accent);cursor:pointer;margin-bottom:8px}
+@media(max-width:520px){.site-header .container{flex-direction:column;align-items:flex-start}nav{margin-bottom:8px}}[
+  {
+    "id": "christendom-critiek",
+    "title": "Waarom sommige christelijke argumenten onlogisch zijn",
+    "tags": ["religie","christendom","logica"],
+    "summary": "Analyse van veelgebruikte argumenten binnen het christendom, met logische tegenargumenten en bronnen.",
+    "content": "<h2>Inleiding</h2><p>Hier leg ik in simpele taal uit waarom bepaalde redeneringen niet kloppen...</p><h3>1) Interne inconsistenties</h3><p>Voorbeeld: ...</p><h3>Bronnen</h3><p>Bijbelverwijzingen en citaten van geleerden kunnen hier.</p>"
+  },
+  {
+    "id": "ik-voel-het-niet-meer",
+    "title": "Waarom 'ik voel het niet meer' geen goede reden is om alles te beëindigen",
+    "tags": ["liefde","relaties"],
+    "summary": "Uitleg waarom gevoelens veranderen, en hoe communicatie en actie belangrijker zijn dan alleen 'gevoel'.",
+    "content": "<p>Gevoelens veranderen vaker dan mensen denken. Voorbeeldstappen: praten, kleine veranderingen, therapie of begeleiding, nadenken over patronen, etc.</p>"
+  },
+  {
+    "id": "politieke-macht-analyse",
+    "title": "Waarom bepaalde landen een grote invloed hebben op internationaal lijden",
+    "tags": ["politiek","wereld"],
+    "summary": "Een overzicht van factoren waardoor landen zoals grote mogendheden invloed hebben op conflicten en economisch lijden wereldwijd.",
+    "content": "<p>Analyse: militaire macht, economische sancties, geopolitieke allianties. Bespreking van oorzaken en gevolgen.</p>"
+  },
+  {
+    "id": "opvoeding-en-ouders",
+    "title": "Opvoeding: wat werkt in de praktijk?",
+    "tags": ["opvoeding","ouders","psychologie"],
+    "summary": "Praktische tips voor opvoeding en gedrag van ouders, met aandacht voor communicatie en grenzen.",
+    "content": "<p>Concrete tips: routine, consequent handelen, luisteren, modelgedrag en grenzen stellen.</p>"
+  }
+]const articlesEl = document.getElementById('articles');
+const fullArticleEl = document.getElementById('full-article');
+const articleView = document.getElementById('article-view');
+const backBtn = document.getElementById('back');
+const searchInput = document.getElementById('search');
+const tagFilter = document.getElementById('tagFilter');
+
+let articles = [];
+
+async function loadArticles(){
+  const res = await fetch('articles.json');
+  articles = await res.json();
+  populateTagFilter();
+  renderArticles(articles);
+}
+
+function populateTagFilter(){
+  const tags = new Set();
+  articles.forEach(a => a.tags.forEach(t => tags.add(t)));
+  tags.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    tagFilter.appendChild(opt);
+  });
+}
+
+function renderArticles(list){
+  articlesEl.innerHTML = '';
+  if(list.length === 0){ articlesEl.innerHTML = '<p>Geen artikelen gevonden.</p>'; return; }
+  list.forEach(a => {
+    const card = document.createElement('div'); card.className='card';
+    const tags = a.tags.map(t=>`<span class="tag">${t}</span>`).join('');
+    card.innerHTML = `<h3>${a.title}</h3><div>${tags}</div><p>${a.summary}</p><button data-id="${a.id}">Lees meer</button>`;
+    articlesEl.appendChild(card);
+  });
+}
+
+articlesEl.addEventListener('click', e=>{
+  const id = e.target.getAttribute('data-id');
+  if(!id) return;
+  const a = articles.find(x => x.id === id);
+  fullArticleEl.innerHTML = `<h1>${a.title}</h1>${a.content}`;
+  articleView.hidden = false;
+  document.getElementById('onderwerpen').scrollIntoView({behavior:'smooth'});
+});
+
+backBtn.addEventListener('click', ()=>{ articleView.hidden = true; });
+
+searchInput.addEventListener('input', ()=> applyFilters());
+tagFilter.addEventListener('change', ()=> applyFilters());
+
+function applyFilters(){
+  const q = searchInput.value.toLowerCase().trim();
+  const tag = tagFilter.value;
+  const filtered = articles.filter(a=>{
+    const matchesQ = a.title.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) || a.content.toLowerCase().includes(q);
+    const matchesTag = tag ? a.tags.includes(tag) : true;
+    return matchesQ && matchesTag;
+  });
+  renderArticles(filtered);
+}
+
+loadArticles();
